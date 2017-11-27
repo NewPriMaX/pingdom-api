@@ -145,11 +145,13 @@ class PingdomApi {
    *   assumed if not explicitly provided.
    * @param array $defaults
    *   An array of default settings for the check.
+   * @param bool returnObject
+   *   Boolean value if method should return object instead of message
    *
-   * @return string
-   *   A success message.
+   * @return mixed
+   *   Either a success message or the response object (StdClass)
    */
-  public function addCheck($check, $defaults = array()) {
+  public function addCheck($check, $defaults = array(), $returnObject = false) {
     $this->ensureParameters(array(
       'name' => $check['name'],
       'host' => $check['host'],
@@ -157,7 +159,19 @@ class PingdomApi {
     ), __METHOD__);
     $check += $defaults;
     $data = $this->request('POST', 'checks', $check);
-    return sprintf('Created check %s for %s at http://%s%s', $data->check->id, $check['name'], $check['host'], $check['url']);
+
+    // Return Object itself or message
+    if($returnObject === true){
+        return $data;
+    }else{
+        return sprintf(
+            'Created check %s for %s at http://%s%s',
+            $data->check->id,
+            $check['name'],
+            $check['host'],
+            $check['url']
+        );
+    }
   }
 
   /**
